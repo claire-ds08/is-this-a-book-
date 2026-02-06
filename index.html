@@ -42,6 +42,26 @@
         #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 10; }
 
         #p1 { z-index: 3; } #p2 { z-index: 2; } #p3 { z-index: 1; }
+
+       /* Carnation Petals */
+.carnation {
+    position: absolute;
+    background-color: #ffa3b1; /* Soft Carnation Pink */
+    border-radius: 50% 0 50% 0;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 100;
+    animation: fall linear infinite;
+}
+
+/* Specific shape for carnation petal */
+.carnation::after {
+    content: '';
+    position: absolute;
+    width: 100%; height: 100%;
+    border: 1px dashed #ff8597;
+    border-radius: 50% 0 50% 0;
+} 
     </style>
 </head>
 <body>
@@ -51,6 +71,9 @@
         <source src="Keenan Te - Rest of My Life (Official Lyric Video).mp3" type="audio/mpeg">
         Your browser does not support audio.
     </audio>
+    <audio id="successSound">
+    <source src="Nickelodeon ApplauseClapping Sound Effects.mp3" type="audio/mpeg">
+</audio>
 </div>
 
 <div class="book">
@@ -66,8 +89,8 @@
 
     <div class="page" id="p2">
         <h2>Level 2: Scrambled Riddle</h2>
-        <img src="IMG_2457.jpeg" style="width: 100%; height: 180px; object-fit: cover; border: 5px solid white; margin-bottom: 20px;">
-        <div style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">C U M E R I A N</div>
+        <img src="IMG_2464.jpeg" style="width: 100%; height: 180px; object-fit: cover; border: 5px solid white; margin-bottom: 20px;">
+        <div style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">A L D I M A T </div>
         <input type="text" id="ans2" placeholder="Unscramble it...">
         <button class="btn" onclick="checkLevel2()">Final Reveal</button>
     </div>
@@ -95,7 +118,7 @@
 
     function checkLevel2() {
     // This line ensures the computer compares lowercase to lowercase
-    if(document.getElementById('ans2').value.toLowerCase().trim() === "manicure") {
+    if(document.getElementById('ans2').value.toLowerCase().trim() === "maldita") {
         document.getElementById('p2').classList.add('flipped');
         setTimeout(() => { 
             document.getElementById('p2').style.zIndex = 0; 
@@ -107,35 +130,83 @@
 }
 
     function initScratch() {
-        const canvas = document.getElementById('scratch-canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#C0C0C0';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = '#888';
-        ctx.font = '20px Georgia';
-        ctx.textAlign = 'center';
-        ctx.fillText('SCRATCH HERE', 150, 85);
+    const canvas = document.getElementById('scratch-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#C0C0C0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#888';
+    ctx.font = '20px Georgia';
+    ctx.textAlign = 'center';
+    ctx.fillText('SCRATCH HERE', 150, 85);
 
-        let isDrawing = false;
-        function scratch(e) {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.arc(x, y, 20, 0, Math.PI * 2);
-            ctx.fill();
+    let isDrawing = false;
+    let effectTriggered = false;
+
+    function scratch(e) {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+        const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Check how much is scratched every 20th movement to save battery
+        checkScratchPercentage();
+    }
+
+    function checkScratchPercentage() {
+        if (effectTriggered) return;
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+        let clearPixels = 0;
+
+        for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] === 0) clearPixels++;
         }
 
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); });
-        window.addEventListener('mouseup', () => isDrawing = false);
-        window.addEventListener('touchend', () => isDrawing = false);
-        canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); });
+        const percentage = (clearPixels / (pixels.length / 4)) * 100;
+
+        if (percentage > 50) { // If 50% is scratched
+            effectTriggered = true;
+            triggerCelebration();
+        }
     }
+
+    function triggerCelebration() {
+        // Play Sound
+        document.getElementById('successSound').play();
+        
+        // Start Carnation Fall
+        setInterval(createCarnation, 300);
+        
+        // Optional: Fade out the remaining silver coating
+        canvas.style.transition = "opacity 1s";
+        canvas.style.opacity = "0";
+    }
+
+    function createCarnation() {
+        const petal = document.createElement('div');
+        petal.classList.add('carnation');
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.width = Math.random() * 20 + 10 + 'px';
+        petal.style.height = petal.style.width;
+        petal.style.animationDuration = Math.random() * 3 + 4 + 's';
+        document.body.appendChild(petal);
+        setTimeout(() => petal.remove(), 6000);
+    }
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); });
+    window.addEventListener('mouseup', () => isDrawing = false);
+    window.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); });
+}
 </script>
 
 </body>
