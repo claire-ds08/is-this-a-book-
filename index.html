@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Memory Challenge</title>
+    <style>
+        :root { --paper: #f4ecd8; --accent: #d4a373; --text: #5d4037; }
+        body { background: #2c241e; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; perspective: 2000px; font-family: 'Georgia', serif; overflow: hidden; touch-action: none; }
+        
+        /* Music Player Styling */
+        .audio-player { position: absolute; top: 20px; z-index: 100; background: rgba(244, 236, 216, 0.9); padding: 5px 15px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+
+        .book { width: 380px; height: 500px; position: relative; transform-style: preserve-3d; }
+        
+        .page { 
+            width: 100%; height: 100%; position: absolute; background: var(--paper);
+            border: 1px solid var(--accent); padding: 25px; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center;
+            backface-visibility: hidden; transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            box-shadow: inset 3px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .flipped { transform: rotateY(-180deg); }
+        
+        .grid-4pics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
+        .grid-4pics img { width: 120px; height: 120px; object-fit: cover; border: 4px solid white; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+        
+        input { padding: 12px; border: 1px solid var(--accent); border-radius: 4px; text-align: center; width: 80%; font-size: 1rem; outline: none; }
+        .btn { margin-top: 15px; padding: 10px 25px; background: var(--accent); color: white; border: none; cursor: pointer; border-radius: 4px; }
+
+        /* Scratch Card */
+        #scratch-container { position: relative; width: 300px; height: 150px; margin-top: 20px; cursor: crosshair; }
+        #scratch-text { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; font-weight: bold; color: var(--text);
+            font-size: 1.1rem; background: #fff; border: 2px dashed var(--accent);
+            padding: 10px; box-sizing: border-box; line-height: 1.4;
+        }
+        #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 10; }
+
+        #p1 { z-index: 3; } #p2 { z-index: 2; } #p3 { z-index: 1; }
+    </style>
+</head>
+<body>
+
+<div class="audio-player">
+    <audio id="bgMusic" controls loop>
+        <source src="Keenan Te - Rest of My Life (Official Lyric Video).mp3" type="audio/mpeg">
+        Your browser does not support audio.
+    </audio>
+</div>
+
+<div class="book">
+    <div class="page" id="p1">
+        <h2>Level 1: 4 Pics 1 Word</h2>
+        <div class="grid-4pics">
+            <img src="IMG_2452.jpeg"> <img src="IMG_2455.jpeg">
+            <img src="IMG_2453.jpeg"> <img src="IMG_2456.jpeg">
+        </div>
+        <input type="text" id="ans1" placeholder="Enter word...">
+        <button class="btn" onclick="checkLevel1()">Unlock Level 2</button>
+    </div>
+
+    <div class="page" id="p2">
+        <h2>Level 2: Scrambled Riddle</h2>
+        <img src="IMG_2457.jpeg" style="width: 100%; height: 180px; object-fit: cover; border: 5px solid white; margin-bottom: 20px;">
+        <div style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">C U M E R I A N</div>
+        <input type="text" id="ans2" placeholder="Unscramble it...">
+        <button class="btn" onclick="checkLevel2()">Final Reveal</button>
+    </div>
+
+    <div class="page" id="p3">
+        <h2>Congratulations!</h2>
+        <p>Scratch the card below to claim your prize:</p>
+        <div id="scratch-container">
+            <div id="scratch-text">
+                Congratulations! You have won an exclusive date with me on February 13!
+            </div>
+            <canvas id="scratch-canvas" width="300" height="150"></canvas>
+        </div>
+        <button class="btn" onclick="location.reload()" style="margin-top: 30px;">Restart Game</button>
+    </div>
+</div>
+
+<script>
+    function checkLevel1() {
+        if(document.getElementById('ans1').value.toLowerCase().trim() === "love") {
+            document.getElementById('p1').classList.add('flipped');
+            setTimeout(() => { document.getElementById('p1').style.zIndex = 0; }, 600);
+        } else { alert("Try again!"); }
+    }
+
+    function checkLevel2() {
+        if(document.getElementById('ans2').value.toLowerCase().trim() === "MANICURE") {
+            document.getElementById('p2').classList.add('flipped');
+            setTimeout(() => { document.getElementById('p2').style.zIndex = 0; initScratch(); }, 600);
+        } else { alert("Try again!"); }
+    }
+
+    function initScratch() {
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#C0C0C0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#888';
+        ctx.font = '20px Georgia';
+        ctx.textAlign = 'center';
+        ctx.fillText('SCRATCH HERE', 150, 85);
+
+        let isDrawing = false;
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); });
+        window.addEventListener('mouseup', () => isDrawing = false);
+        window.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); });
+    }
+</script>
+
+</body>
+</html>
