@@ -94,12 +94,17 @@
     }
 
     function checkLevel2() {
-        // We changed "MANICURE" to "manicure" so it matches the lowercase conversion
-        if(document.getElementById('ans2').value.toLowerCase().trim() === "manicure") {
-            document.getElementById('p2').classList.add('flipped');
-            setTimeout(() => { document.getElementById('p2').style.zIndex = 0; initScratch(); }, 600);
-        } else { alert("Try again!"); }
+    // This line ensures the computer compares lowercase to lowercase
+    if(document.getElementById('ans2').value.toLowerCase().trim() === "manicure") {
+        document.getElementById('p2').classList.add('flipped');
+        setTimeout(() => { 
+            document.getElementById('p2').style.zIndex = 0; 
+            initScratch(); 
+        }, 600);
+    } else { 
+        alert("Try again!"); 
     }
+}
 
     function initScratch() {
         const canvas = document.getElementById('scratch-canvas');
