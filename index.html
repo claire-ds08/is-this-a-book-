@@ -23,6 +23,13 @@
         #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 10; }
         .carnation { position: absolute; background-color: #ffa3b1; border-radius: 50% 0 50% 0; opacity: 0.8; pointer-events: none; z-index: 100; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(100vh) rotate(360deg); } }
+        #player, #partner {
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    width: 60px;
+    height: 60px;
+}
     </style>
 </head>
 <body>
@@ -67,8 +74,8 @@
         <h2>Level 4: Jump to Me!</h2>
         <div id="game-area">
             <div id="heart-pop">❤️</div>
-            <img id="player" src="IMG_2465.jpeg" style="width:50px; position:absolute; bottom:0; left:20px; transition: left 1s, bottom 0.3s;">
-            <img id="partner" src="IMG_2466.jpeg" style="width:50px; position:absolute; bottom:0; right:-60px; transition: right 1s;">
+            <img id="player" src="IMG_2465.jpeg" style="width:60px; height:60px; object-fit:cover; border-radius: 50%; border: 2px solid white; position:absolute; bottom:0; left:20px; transition: left 1s, bottom 0.3s; z-index: 2;">
+            <img id="partner" src="IMG_2466.jpeg" style="width:60px; height:60px; object-fit:cover; border-radius: 50%; border: 2px solid white; position:absolute; bottom:0; right:-60px; transition: right 1s; z-index: 2;">
             <div id="thorn" style="width:25px; height:25px; background:#2e7d32; position:absolute; bottom:0; right:-30px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
         </div>
         <p id="score">Score: 0</p>
@@ -147,7 +154,7 @@
             if(!isPlaying) { clearInterval(loop); return; }
             tPos -= 6;
             if(tPos < -30) { tPos = 300; score++; document.getElementById('score').innerText = "Score: " + score; }
-            if(score >= 10) { isPlaying = false; showHug(); }
+            if(score >= 3) { isPlaying = false; showHug(); }
             thorn.style.right = (300 - tPos) + "px";
             const pBottom = parseInt(document.getElementById('player').style.bottom) || 0;
             if(tPos > 210 && tPos < 250 && pBottom < 25) { score = 0; tPos = 300; document.getElementById('score').innerText = "Score: 0"; }
