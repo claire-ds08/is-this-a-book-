@@ -62,6 +62,11 @@
     border: 1px dashed #ff8597;
     border-radius: 50% 0 50% 0;
 } 
+        @keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
     </style>
 </head>
 <body>
@@ -108,21 +113,28 @@
 </div>
 
     <div class="page" id="p4" style="z-index: 2;">
-        <h2>Level 4: Jump to Me!</h2>
-        <div id="game-area" style="width:300px; height:200px; border-bottom: 2px solid #5d4037; position:relative; overflow:hidden; background:#fff; margin: 10px 0;">
-            <img id="player" src="character.png" style="width:50px; position:absolute; bottom:0; left:20px;">
-            <div id="thorn" style="width:25px; height:25px; background:red; position:absolute; bottom:0; right:-30px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
-        </div>
-        <p id="game-status">Tap screen to jump! Score 10.</p>
-        <p id="score" style="font-weight:bold;">Score: 0</p>
+    <h2>Level 4: Jump to Me!</h2>
+    <div id="game-area" style="width:300px; height:200px; border-bottom: 3px solid #5d4037; position:relative; overflow:hidden; background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%); margin: 10px 0; border-radius: 8px;">
+        <div style="position:absolute; top:20px; right:40px; width:40px; height:40px; background:#fff176; border-radius:50%; box-shadow: 0 0 20px #fff176; opacity:0.8;"></div>
         
-        <div id="hug-reveal" style="display:none; text-align:center;">
-            <p>You made it! 🫂</p>
-            <img src="hug.jpg" style="width:100%; height:160px; object-fit:cover; border: 5px solid white;">
-            <button class="btn" onclick="unlockFinal()">See my Surprise</button>
-        </div>
-    </div>
+        <div id="heart-pop" style="position:absolute; bottom:60px; left:135px; font-size:30px; display:none; animation: heartbeat 1s infinite;">❤️</div>
 
+        <img id="player" src="IMG_2465.jpeg" style="width:50px; position:absolute; bottom:0; left:20px; transition: left 1s, bottom 0.3s; z-index: 2;">
+        
+        <img id="partner" src="IMG_2466.jpeg" style="width:50px; position:absolute; bottom:0; right:-60px; transition: right 1s; z-index: 2;">
+
+        <div id="thorn" style="width:25px; height:25px; background:#2e7d32; position:absolute; bottom:0; right:-30px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+    </div>
+    
+    <p id="game-status">Tap the screen to jump! Score 10.</p>
+    <p id="score" style="font-weight:bold;">Score: 0</p>
+    
+    <div id="hug-reveal" style="display:none; text-align:center;">
+        <p style="font-size: 1.1rem; color: #d4a373; font-weight: bold;">Together at last! 🫂</p>
+        <button class="btn" onclick="unlockFinal()">See my Surprise</button>
+    </div>
+</div>
+</div>
     <div class="page" id="p5" style="z-index: 1;">
         <h2>Congratulations!</h2>
         <p>Scratch the card to claim your prize:</p>
@@ -193,19 +205,76 @@ function checkQuiz() {
 // --- LEVEL 4 JUMP GAME LOGIC ---
 let gameScore = 0;
 let isPlaying = false;
+
 function initGame() {
     isPlaying = true;
     const player = document.getElementById('player');
     const thorn = document.getElementById('thorn');
     let jumping = false;
 
-    document.addEventListener('touchstart', () => {
+    // TAPPING TO JUMP
+    // We attach the listener to the whole document or just the game-area
+    document.addEventListener('touchstart', function handleJump(e) {
         if (!jumping && isPlaying) {
             jumping = true;
-            player.style.transition = "bottom 0.3s";
-            player.style.bottom = "80px";
-            setTimeout(() => { player.style.bottom = "0"; jumping = false; }, 300);
+            player.style.bottom = "80px"; // Height of jump
+            setTimeout(() => { 
+                player.style.bottom = "0"; 
+                jumping = false; 
+            }, 300); // Speed of fall
         }
+    }, { passive: false });
+
+    let tPos = 300;
+    let loop = setInterval(() => {
+        if (!isPlaying) { clearInterval(loop); return; }
+        
+        tPos -= 6; // Speed of thorn
+        if (tPos < -30) {
+            tPos = 300;
+            gameScore++;
+            document.getElementById('score').innerText = "Score: " + gameScore;
+            if (gameScore >= 10) { isPlaying = false; showHug(); }
+        }
+        thorn.style.right = (300 - tPos) + "px";
+
+        // Collision Logic
+        if (tPos > 210 && tPos < 250 && !jumping) {
+            gameScore = 0;
+            document.getElementById('score').innerText = "Score: 0";
+            tPos = 300;
+        }
+    }, 20);
+}
+
+function showHug() {
+    isPlaying = false;
+    const player = document.getElementById('player');
+    const partner = document.getElementById('partner');
+    const heart = document.getElementById('heart-pop');
+    
+    // Hide game elements
+    document.getElementById('thorn').style.display = "none";
+    document.getElementById('score').style.display = "none";
+    document.getElementById('game-status').style.display = "none";
+
+    // Characters walk to meet in the middle
+    player.style.left = "110px";
+    partner.style.right = "110px";
+
+    // Wait for them to "reach" each other
+    setTimeout(() => {
+        heart.style.display = "block"; // Show the heart!
+        document.getElementById('hug-reveal').style.display = "block";
+        
+        // Trigger celebration effects
+        if(window.initScratch) {
+             document.getElementById('successSound').play();
+             // If you added the carnation function earlier, call it here!
+             setInterval(createCarnation, 300); 
+        }
+    }, 1000);
+}
     });
 
     let tPos = 300;
