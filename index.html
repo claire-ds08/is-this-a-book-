@@ -119,21 +119,40 @@
     }
 
     // Level 3 Quiz
+    // Level 3 Quiz
     let curQ = 1;
     function checkQuiz() {
         const val = document.getElementById('ansQuiz').value.toLowerCase().trim();
         const text = document.getElementById('q-text');
         const label = document.getElementById('q-label');
+        const input = document.getElementById('ansQuiz');
 
-        if(curQ === 1 && val === "quezon") { // CHANGE ANSWERS HERE
-            curQ = 2; label.innerText = "QUESTION 2 OF 3"; text.innerText = "Where was our first date?";
-            document.getElementById('ansQuiz').value = "";
-        } else if(curQ === 2 && val === "sm seaside") { 
-            curQ = 3; label.innerText = "QUESTION 3 OF 3"; text.innerText = "When was our first photo taken?";
-            document.getElementById('ansQuiz').value = "";
-        } else if(curQ === 3 && val === "08/03/2025") { 
-            flip('p3'); setTimeout(initGame, 1000);
-        } else alert("Wrong answer!");
+        if(curQ === 1) {
+            if(val === "quezon") { // <-- EDIT 1st ANSWER HERE
+                curQ = 2; 
+                label.innerText = "QUESTION 2 OF 3"; 
+                text.innerText = "Where was our first date?"; // <-- EDIT 2nd QUESTION
+                input.value = "";
+            } else { alert("Not quite! Try again."); }
+        } 
+        else if(curQ === 2) {
+            if(val === "sm seaside") { // <-- EDIT 2nd ANSWER HERE
+                curQ = 3; 
+                label.innerText = "QUESTION 3 OF 3"; 
+                text.innerText = "When was our first photo taken?"; // <-- EDIT 3rd QUESTION
+                input.value = "";
+            } else { alert("Wrong answer! Hint: PNA Convention."); }
+        } 
+        else if(curQ === 3) {
+            if(val === "August 30") { // <-- EDIT 3rd ANSWER HERE
+                // THIS PART WAS LIKELY BROKEN - IT NOW FLIPS PROPERLY
+                flip('p3'); 
+                setTimeout(() => {
+                    initGame(); // This starts the jumping game on the next page
+                }, 1000);
+            } else { alert("Last one! You can do it!"); }
+        }
+    }
     }
 
     // Level 4 Game
