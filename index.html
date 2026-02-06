@@ -95,14 +95,17 @@
         <button class="btn" onclick="checkLevel2()">Unlock Level 3</button>
     </div>
 
-    <div class="page" id="p3" style="z-index: 3;">
-        <h2>Level 3: The Quiz</h2>
-        <div id="quiz-container">
-            <p id="question-text" style="font-weight:bold; color:#5d4037;">Question 1: [Type your first question here]?</p>
-            <input type="text" id="ansQuiz" placeholder="Answer here...">
-            <button class="btn" style="display:block; margin: 15px auto;" onclick="checkQuiz()">Submit Answer</button>
-        </div>
+ <div class="page" id="p3" style="z-index: 3;">
+    <h2>Level 3: The Quiz</h2>
+    <div id="quiz-container" style="text-align: center;">
+        <p id="current-q-label" style="font-size: 0.8rem; color: var(--accent); margin-bottom: 0;">QUESTION 1 OF 3</p>
+        <p id="question-text" style="font-weight:bold; color:#5d4037; min-height: 50px; margin-top: 10px;">
+            What was the name of the first movie we watched together?
+        </p>
+        <input type="text" id="ansQuiz" placeholder="Type answer here...">
+        <button class="btn" style="display:block; margin: 20px auto;" onclick="checkQuiz()">Submit Answer</button>
     </div>
+</div>
 
     <div class="page" id="p4" style="z-index: 2;">
         <h2>Level 4: Jump to Me!</h2>
@@ -143,8 +146,8 @@ function checkLevel1() {
 }
 
 function checkLevel2() {
-    // Corrected to lowercase "matilda" to match your scrambled word
-    if(document.getElementById('ans2').value.toLowerCase().trim() === "matilda") {
+    // Corrected to lowercase "maldita" to match your scrambled word
+    if(document.getElementById('ans2').value.toLowerCase().trim() === "maldita") {
         document.getElementById('p2').classList.add('flipped');
         setTimeout(() => { document.getElementById('p2').style.zIndex = 0; }, 600);
     } else { alert("Try again!"); }
@@ -152,22 +155,38 @@ function checkLevel2() {
 
 // --- LEVEL 3 QUIZ LOGIC ---
 let currentQ = 1;
+
 function checkQuiz() {
     const val = document.getElementById('ansQuiz').value.toLowerCase().trim();
-    
-    if (currentQ === 1 && val === "answer1") { // Change answer1 to your real answer
-        currentQ = 2;
-        document.getElementById('question-text').innerText = "Question 2: [Your 2nd Question]?";
-        document.getElementById('ansQuiz').value = "";
-    } else if (currentQ === 2 && val === "answer2") { // Change answer2
-        currentQ = 3;
-        document.getElementById('question-text').innerText = "Question 3: [Your 3rd Question]?";
-        document.getElementById('ansQuiz').value = "";
-    } else if (currentQ === 3 && val === "answer3") { // Change answer3
-        document.getElementById('p3').classList.add('flipped');
-        setTimeout(() => { document.getElementById('p3').style.zIndex = 0; initGame(); }, 600);
-    } else {
-        alert("Not quite, try again!");
+    const qText = document.getElementById('question-text');
+    const qLabel = document.getElementById('current-q-label');
+    const qInput = document.getElementById('ansQuiz');
+
+    if (currentQ === 1) {
+        if (val === "quezon") { // <-- REPLACE "answer1" WITH YOUR FIRST ANSWER
+            currentQ = 2;
+            qLabel.innerText = "QUESTION 2 OF 3";
+            qText.innerText = "Where did we go on our very first date?"; // <-- YOUR 2ND QUESTION
+            qInput.value = "";
+        } else { alert("Try again, love!"); }
+    } 
+    else if (currentQ === 2) {
+        if (val === "sm seaside") { // <-- REPLACE "answer2" WITH YOUR SECOND ANSWER
+            currentQ = 3;
+            qLabel.innerText = "QUESTION 3 OF 3";
+            qText.innerText = "What is the one food I can't live without?"; // <-- YOUR 3RD QUESTION
+            qInput.value = "";
+        } else { alert("Almost there! Try again."); }
+    } 
+    else if (currentQ === 3) {
+        if (val === "egg") { // <-- REPLACE "answer3" WITH YOUR THIRD ANSWER
+            // Correct! Proceed to the Game
+            document.getElementById('p3').classList.add('flipped');
+            setTimeout(() => { 
+                document.getElementById('p3').style.zIndex = 0; 
+                initGame(); // Starts the Level 4 jumping game
+            }, 600);
+        } else { alert("Last one! You can do it!"); }
     }
 }
 
