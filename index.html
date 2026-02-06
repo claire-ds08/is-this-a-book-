@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Memory Challenge</title>
     <style>
         :root { --paper: #f4ecd8; --accent: #d4a373; --text: #5d4037; }
         body { background: #2c241e; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; perspective: 2000px; font-family: 'Georgia', serif; overflow: hidden; touch-action: none; }
         
-        /* Music Player Styling */
         .audio-player { position: absolute; top: 20px; z-index: 100; background: rgba(244, 236, 216, 0.9); padding: 5px 15px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
 
         .book { width: 380px; height: 500px; position: relative; transform-style: preserve-3d; }
@@ -23,50 +22,24 @@
         }
 
         .flipped { transform: rotateY(-180deg); }
-        
         .grid-4pics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
         .grid-4pics img { width: 120px; height: 120px; object-fit: cover; border: 4px solid white; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
         
         input { padding: 12px; border: 1px solid var(--accent); border-radius: 4px; text-align: center; width: 80%; font-size: 1rem; outline: none; }
         .btn { margin-top: 15px; padding: 10px 25px; background: var(--accent); color: white; border: none; cursor: pointer; border-radius: 4px; }
 
+        /* Game & Effects */
+        #game-area { width: 100%; height: 200px; border-bottom: 3px solid var(--text); position: relative; overflow: hidden; background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%); margin: 10px 0; border-radius: 8px; }
+        #heart-pop { position: absolute; bottom: 60px; left: 135px; font-size: 30px; display: none; animation: heartbeat 1s infinite; z-index: 10; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
         /* Scratch Card */
         #scratch-container { position: relative; width: 300px; height: 150px; margin-top: 20px; cursor: crosshair; }
-        #scratch-text { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center; font-weight: bold; color: var(--text);
-            font-size: 1.1rem; background: #fff; border: 2px dashed var(--accent);
-            padding: 10px; box-sizing: border-box; line-height: 1.4;
-        }
+        #scratch-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; color: var(--text); font-size: 1.1rem; background: #fff; border: 2px dashed var(--accent); padding: 10px; box-sizing: border-box; }
         #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 10; }
 
-        #p1 { z-index: 3; } #p2 { z-index: 2; } #p3 { z-index: 1; }
-
-       /* Carnation Petals */
-.carnation {
-    position: absolute;
-    background-color: #ffa3b1; /* Soft Carnation Pink */
-    border-radius: 50% 0 50% 0;
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: 100;
-    animation: fall linear infinite;
-}
-
-/* Specific shape for carnation petal */
-.carnation::after {
-    content: '';
-    position: absolute;
-    width: 100%; height: 100%;
-    border: 1px dashed #ff8597;
-    border-radius: 50% 0 50% 0;
-} 
-        @keyframes heartbeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
+        .carnation { position: absolute; background-color: #ffa3b1; border-radius: 50% 0 50% 0; opacity: 0.8; pointer-events: none; z-index: 100; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -74,11 +47,8 @@
 <div class="audio-player">
     <audio id="bgMusic" controls loop>
         <source src="Keenan Te - Rest of My Life (Official Lyric Video).mp3" type="audio/mpeg">
-        Your browser does not support audio.
     </audio>
-    <audio id="successSound">
-    <source src="Nickelodeon ApplauseClapping Sound Effects.mp3" type="audio/mpeg">
-</audio>
+    <audio id="successSound"><source src="Nickelodeon ApplauseClapping Sound Effects.mp3" type="audio/mpeg"></audio>
 </div>
 
 <div class="book">
@@ -93,250 +63,152 @@
     </div>
 
     <div class="page" id="p2" style="z-index: 4;">
-        <h2>Level 2: Scrambled Riddle</h2>
+        <h2>Level 2: Scramble</h2>
         <img src="IMG_2464.jpeg" style="width: 100%; height: 180px; object-fit: cover; border: 5px solid white; margin-bottom: 20px;">
         <div style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">A L D I M A T</div>
-        <input type="text" id="ans2" placeholder="Unscramble it...">
+        <input type="text" id="ans2" placeholder="Unscramble...">
         <button class="btn" onclick="checkLevel2()">Unlock Level 3</button>
     </div>
 
- <div class="page" id="p3" style="z-index: 3;">
-    <h2>Level 3: The Quiz</h2>
-    <div id="quiz-container" style="text-align: center;">
-        <p id="current-q-label" style="font-size: 0.8rem; color: var(--accent); margin-bottom: 0;">QUESTION 1 OF 3</p>
-        <p id="question-text" style="font-weight:bold; color:#5d4037; min-height: 50px; margin-top: 10px;">
-            What was the name of the first movie we watched together?
-        </p>
-        <input type="text" id="ansQuiz" placeholder="Type answer here...">
-        <button class="btn" style="display:block; margin: 20px auto;" onclick="checkQuiz()">Submit Answer</button>
+    <div class="page" id="p3" style="z-index: 3;">
+        <h2>Level 3: The Quiz</h2>
+        <div id="quiz-container">
+            <p id="q-label" style="font-size: 0.8rem; color: var(--accent);">QUESTION 1 OF 3</p>
+            <p id="q-text" style="font-weight:bold; min-height: 50px;">What movie did we first watch?</p>
+            <input type="text" id="ansQuiz" placeholder="Answer here...">
+            <button class="btn" onclick="checkQuiz()">Submit</button>
+        </div>
     </div>
-</div>
 
     <div class="page" id="p4" style="z-index: 2;">
-    <h2>Level 4: Jump to Me!</h2>
-    <div id="game-area" style="width:300px; height:200px; border-bottom: 3px solid #5d4037; position:relative; overflow:hidden; background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%); margin: 10px 0; border-radius: 8px;">
-        <div style="position:absolute; top:20px; right:40px; width:40px; height:40px; background:#fff176; border-radius:50%; box-shadow: 0 0 20px #fff176; opacity:0.8;"></div>
-        
-        <div id="heart-pop" style="position:absolute; bottom:60px; left:135px; font-size:30px; display:none; animation: heartbeat 1s infinite;">❤️</div>
-
-        <img id="player" src="IMG_2465.jpeg" style="width:50px; position:absolute; bottom:0; left:20px; transition: left 1s, bottom 0.3s; z-index: 2;">
-        
-        <img id="partner" src="IMG_2466.jpeg" style="width:50px; position:absolute; bottom:0; right:-60px; transition: right 1s; z-index: 2;">
-
-        <div id="thorn" style="width:25px; height:25px; background:#2e7d32; position:absolute; bottom:0; right:-30px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+        <h2>Level 4: Jump to Me!</h2>
+        <div id="game-area">
+            <div id="heart-pop">❤️</div>
+            <img id="player" src="IMG_2465.jpeg" style="width:50px; position:absolute; bottom:0; left:20px; transition: left 1s, bottom 0.3s;">
+            <img id="partner" src="IMG_2466.jpeg" style="width:50px; position:absolute; bottom:0; right:-60px; transition: right 1s;">
+            <div id="thorn" style="width:25px; height:25px; background:#2e7d32; position:absolute; bottom:0; right:-30px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+        </div>
+        <p id="score">Score: 0</p>
+        <div id="hug-reveal" style="display:none; text-align:center;">
+            <p>Together at last! 🫂</p>
+            <button class="btn" onclick="unlockFinal()">See Surprise</button>
+        </div>
     </div>
-    
-    <p id="game-status">Tap the screen to jump! Score 10.</p>
-    <p id="score" style="font-weight:bold;">Score: 0</p>
-    
-    <div id="hug-reveal" style="display:none; text-align:center;">
-        <p style="font-size: 1.1rem; color: #d4a373; font-weight: bold;">Together at last! 🫂</p>
-        <button class="btn" onclick="unlockFinal()">See my Surprise</button>
-    </div>
-</div>
-</div>
+
     <div class="page" id="p5" style="z-index: 1;">
         <h2>Congratulations!</h2>
-        <p>Scratch the card to claim your prize:</p>
         <div id="scratch-container">
-            <div id="scratch-text">
-                Congratulations! You have won an exclusive date with me on February 13!
-            </div>
+            <div id="scratch-text"> You have won a date with me on Feb 13! ❤️</div>
             <canvas id="scratch-canvas" width="300" height="150"></canvas>
         </div>
-        <button class="btn" onclick="location.reload()" style="margin-top: 30px;">Restart Game</button>
+        <button class="btn" onclick="location.reload()">Restart</button>
     </div>
 </div>
 
 <script>
-    // --- LEVEL 1 & 2 LOGIC ---
-function checkLevel1() {
-    if(document.getElementById('ans1').value.toLowerCase().trim() === "love") {
-        document.getElementById('p1').classList.add('flipped');
-        setTimeout(() => { document.getElementById('p1').style.zIndex = 0; }, 600);
-    } else { alert("Try again!"); }
-}
-
-function checkLevel2() {
-    // Corrected to lowercase "matilda" to match your scrambled word
-    if(document.getElementById('ans2').value.toLowerCase().trim() === "maldita") {
-        document.getElementById('p2').classList.add('flipped');
-        setTimeout(() => { document.getElementById('p2').style.zIndex = 0; }, 600);
-    } else { alert("Try again!"); }
-}
-
-// --- LEVEL 3 QUIZ LOGIC ---
-let currentQ = 1;
-
-function checkQuiz() {
-    const val = document.getElementById('ansQuiz').value.toLowerCase().trim();
-    const qText = document.getElementById('question-text');
-    const qLabel = document.getElementById('current-q-label');
-    const qInput = document.getElementById('ansQuiz');
-
-    if (currentQ === 1) {
-        if (val === "quezon") { // <-- REPLACE "answer1" WITH YOUR FIRST ANSWER
-            currentQ = 2;
-            qLabel.innerText = "QUESTION 2 OF 3";
-            qText.innerText = "Where did we go on our very first date?"; // <-- YOUR 2ND QUESTION
-            qInput.value = "";
-        } else { alert("Try again, love!"); }
-    } 
-    else if (currentQ === 2) {
-        if (val === "sm seaside") { // <-- REPLACE "answer2" WITH YOUR SECOND ANSWER
-            currentQ = 3;
-            qLabel.innerText = "QUESTION 3 OF 3";
-            qText.innerText = "What is the one food I can't live without?"; // <-- YOUR 3RD QUESTION
-            qInput.value = "";
-        } else { alert("Almost there! Try again."); }
-    } 
-    else if (currentQ === 3) {
-        if (val === "egg") { // <-- REPLACE "answer3" WITH YOUR THIRD ANSWER
-            // Correct! Proceed to the Game
-            document.getElementById('p3').classList.add('flipped');
-            setTimeout(() => { 
-                document.getElementById('p3').style.zIndex = 0; 
-                initGame(); // Starts the Level 4 jumping game
-            }, 600);
-        } else { alert("Last one! You can do it!"); }
+    // Levels 1 & 2
+    function checkLevel1() {
+        if(document.getElementById('ans1').value.toLowerCase().trim() === "love") {
+            flip('p1');
+        } else alert("Try again!");
     }
-}
-
-// --- LEVEL 4 JUMP GAME LOGIC ---
-let gameScore = 0;
-let isPlaying = false;
-
-function initGame() {
-    isPlaying = true;
-    const player = document.getElementById('player');
-    const thorn = document.getElementById('thorn');
-    let jumping = false;
-
-    // TAPPING TO JUMP
-    // We attach the listener to the whole document or just the game-area
-    document.addEventListener('touchstart', function handleJump(e) {
-        if (!jumping && isPlaying) {
-            jumping = true;
-            player.style.bottom = "80px"; // Height of jump
-            setTimeout(() => { 
-                player.style.bottom = "0"; 
-                jumping = false; 
-            }, 300); // Speed of fall
-        }
-    }, { passive: false });
-
-    let tPos = 300;
-    let loop = setInterval(() => {
-        if (!isPlaying) { clearInterval(loop); return; }
-        
-        tPos -= 6; // Speed of thorn
-        if (tPos < -30) {
-            tPos = 300;
-            gameScore++;
-            document.getElementById('score').innerText = "Score: " + gameScore;
-            if (gameScore >= 10) { isPlaying = false; showHug(); }
-        }
-        thorn.style.right = (300 - tPos) + "px";
-
-        // Collision Logic
-        if (tPos > 210 && tPos < 250 && !jumping) {
-            gameScore = 0;
-            document.getElementById('score').innerText = "Score: 0";
-            tPos = 300;
-        }
-    }, 20);
-}
-
-function showHug() {
-    isPlaying = false;
-    const player = document.getElementById('player');
-    const partner = document.getElementById('partner');
-    const heart = document.getElementById('heart-pop');
-    
-    // Hide game elements
-    document.getElementById('thorn').style.display = "none";
-    document.getElementById('score').style.display = "none";
-    document.getElementById('game-status').style.display = "none";
-
-    // Characters walk to meet in the middle
-    player.style.left = "110px";
-    partner.style.right = "110px";
-
-    // Wait for them to "reach" each other
-    setTimeout(() => {
-        heart.style.display = "block"; // Show the heart!
-        document.getElementById('hug-reveal').style.display = "block";
-        
-        // Trigger celebration effects
-        if(window.initScratch) {
-             document.getElementById('successSound').play();
-             // If you added the carnation function earlier, call it here!
-             setInterval(createCarnation, 300); 
-        }
-    }, 1000);
-}
-    });
-
-    let tPos = 300;
-    let loop = setInterval(() => {
-        if (!isPlaying) { clearInterval(loop); return; }
-        tPos -= 6;
-        if (tPos < -30) {
-            tPos = 300;
-            gameScore++;
-            document.getElementById('score').innerText = "Score: " + gameScore;
-            if (gameScore >= 10) { isPlaying = false; showHug(); }
-        }
-        thorn.style.right = (300 - tPos) + "px";
-
-        if (tPos > 210 && tPos < 250 && !jumping) { // Collision
-            gameScore = 0;
-            document.getElementById('score').innerText = "Score: 0";
-            tPos = 300;
-        }
-    }, 20);
-}
-
-function showHug() {
-    document.getElementById('game-area').style.display = "none";
-    document.getElementById('score').style.display = "none";
-    document.getElementById('game-status').style.display = "none";
-    document.getElementById('hug-reveal').style.display = "block";
-}
-
-function unlockFinal() {
-    document.getElementById('p4').classList.add('flipped');
-    setTimeout(() => { document.getElementById('p4').style.zIndex = 0; initScratch(); }, 600);
-}
-
-// --- FINAL SCRATCH LOGIC ---
-function initScratch() {
-    const canvas = document.getElementById('scratch-canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#C0C0C0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#888';
-    ctx.font = '20px Georgia';
-    ctx.textAlign = 'center';
-    ctx.fillText('SCRATCH HERE', 150, 85);
-
-    let drawing = false;
-    function scratch(e) {
-        if (!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+    function checkLevel2() {
+        if(document.getElementById('ans2').value.toLowerCase().trim() === "maldita") {
+            flip('p2');
+        } else alert("Try again!");
     }
-    canvas.addEventListener('mousedown', () => drawing = true);
-    canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); });
-    window.addEventListener('mouseup', () => drawing = false);
-    window.addEventListener('touchend', () => drawing = false);
-    canvas.addEventListener('mousemove', scratch);
-    canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); });
-}
+
+    // Level 3 Quiz
+    let curQ = 1;
+    function checkQuiz() {
+        const val = document.getElementById('ansQuiz').value.toLowerCase().trim();
+        const text = document.getElementById('q-text');
+        const label = document.getElementById('q-label');
+
+        if(curQ === 1 && val === "quezon") { // CHANGE ANSWERS HERE
+            curQ = 2; label.innerText = "QUESTION 2 OF 3"; text.innerText = "Where was our first date?";
+            document.getElementById('ansQuiz').value = "";
+        } else if(curQ === 2 && val === "sm seaside") { 
+            curQ = 3; label.innerText = "QUESTION 3 OF 3"; text.innerText = "When was our first photo taken?";
+            document.getElementById('ansQuiz').value = "";
+        } else if(curQ === 3 && val === "August 30,2025") { 
+            flip('p3'); setTimeout(initGame, 1000);
+        } else alert("Wrong answer!");
+    }
+
+    // Level 4 Game
+    let score = 0, isPlaying = false;
+    function initGame() {
+        isPlaying = true;
+        const thorn = document.getElementById('thorn');
+        document.addEventListener('touchstart', (e) => {
+            const p = document.getElementById('player');
+            if(isPlaying && p.style.bottom === "0px" || !p.style.bottom) {
+                p.style.bottom = "80px";
+                setTimeout(() => p.style.bottom = "0", 300);
+            }
+        });
+
+        let tPos = 300;
+        let loop = setInterval(() => {
+            if(!isPlaying) { clearInterval(loop); return; }
+            tPos -= 6;
+            if(tPos < -30) { tPos = 300; score++; document.getElementById('score').innerText = "Score: " + score; }
+            if(score >= 10) { isPlaying = false; showHug(); }
+            thorn.style.right = (300 - tPos) + "px";
+            // Collision
+            const pBottom = parseInt(document.getElementById('player').style.bottom);
+            if(tPos > 210 && tPos < 250 && (!pBottom || pBottom < 25)) { score = 0; tPos = 300; document.getElementById('score').innerText = "Score: 0"; }
+        }, 20);
+    }
+
+    function showHug() {
+        document.getElementById('thorn').style.display = "none";
+        document.getElementById('player').style.left = "110px";
+        document.getElementById('partner').style.right = "110px";
+        setTimeout(() => {
+            document.getElementById('heart-pop').style.display = "block";
+            document.getElementById('hug-reveal').style.display = "block";
+            document.getElementById('successSound').play();
+            setInterval(createCarnation, 400);
+        }, 1000);
+    }
+
+    function flip(id) {
+        document.getElementById(id).classList.add('flipped');
+        setTimeout(() => document.getElementById(id).style.zIndex = 0, 600);
+    }
+
+    function unlockFinal() { flip('p4'); initScratch(); }
+
+    function initScratch() {
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#C0C0C0'; ctx.fillRect(0,0,300,150);
+        ctx.fillStyle = '#888'; ctx.font = '20px Georgia'; ctx.fillText('SCRATCH HERE', 75, 80);
+        let draw = false;
+        const scratch = (e) => {
+            if(!draw) return;
+            const r = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - r.left;
+            const y = (e.clientY || e.touches[0].clientY) - r.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath(); ctx.arc(x,y,20,0,Math.PI*2); ctx.fill();
+        };
+        canvas.addEventListener('mousedown', () => draw = true);
+        canvas.addEventListener('touchstart', (e) => { draw = true; e.preventDefault(); });
+        window.addEventListener('mouseup', () => draw = false);
+        window.addEventListener('touchend', () => draw = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchmove', scratch);
+    }
+
+    function createCarnation() {
+        const p = document.createElement('div'); p.className = 'carnation';
+        p.style.left = Math.random() * 100 + 'vw'; p.style.width = p.style.height = '15px';
+        p.style.animationDuration = (Math.random()*3+2)+'s';
+        document.body.appendChild(p); setTimeout(() => p.remove(), 5000);
+    }
 </script>
-
 </body>
 </html>
