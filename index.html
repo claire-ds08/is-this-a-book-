@@ -144,18 +144,13 @@
             } else { alert("Wrong answer! Hint: PNA Convention."); }
         } 
         else if(curQ === 3) {
-        // We use lowercase here so it matches the .toLowerCase() conversion
-        if(val === "august 30") { 
-            flip('p3'); 
-            setTimeout(() => {
-                // Ensure the game page is ready before starting logic
-                document.getElementById('p3').style.zIndex = 0; 
-                initGame(); 
-            }, 1000);
-        } else { 
-            alert("Last one! You can do it! Hint: Month and Day."); 
-        }
-    }
+            if(val === "august 30") { // <-- EDIT 3rd ANSWER HERE
+                // THIS PART WAS LIKELY BROKEN - IT NOW FLIPS PROPERLY
+                flip('p3'); 
+                setTimeout(() => {
+                    initGame(); // This starts the jumping game on the next page
+                }, 1000);
+            } else { alert("Last one! You can do it!"); }
     }
     }
 
