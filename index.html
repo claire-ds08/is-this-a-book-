@@ -77,7 +77,7 @@
 </div>
 
 <div class="book">
-    <div class="page" id="p1">
+    <div class="page" id="p1" style="z-index: 5;">
         <h2>Level 1: 4 Pics 1 Word</h2>
         <div class="grid-4pics">
             <img src="IMG_2452.jpeg"> <img src="IMG_2455.jpeg">
@@ -87,17 +87,42 @@
         <button class="btn" onclick="checkLevel1()">Unlock Level 2</button>
     </div>
 
-    <div class="page" id="p2">
+    <div class="page" id="p2" style="z-index: 4;">
         <h2>Level 2: Scrambled Riddle</h2>
         <img src="IMG_2464.jpeg" style="width: 100%; height: 180px; object-fit: cover; border: 5px solid white; margin-bottom: 20px;">
-        <div style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">A L D I M A T </div>
+        <div style="font-size: 1.5rem; letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">A L D I M A T</div>
         <input type="text" id="ans2" placeholder="Unscramble it...">
-        <button class="btn" onclick="checkLevel2()">Final Reveal</button>
+        <button class="btn" onclick="checkLevel2()">Unlock Level 3</button>
     </div>
 
-    <div class="page" id="p3">
+    <div class="page" id="p3" style="z-index: 3;">
+        <h2>Level 3: The Quiz</h2>
+        <div id="quiz-container">
+            <p id="question-text" style="font-weight:bold; color:#5d4037;">Question 1: [Type your first question here]?</p>
+            <input type="text" id="ansQuiz" placeholder="Answer here...">
+            <button class="btn" style="display:block; margin: 15px auto;" onclick="checkQuiz()">Submit Answer</button>
+        </div>
+    </div>
+
+    <div class="page" id="p4" style="z-index: 2;">
+        <h2>Level 4: Jump to Me!</h2>
+        <div id="game-area" style="width:300px; height:200px; border-bottom: 2px solid #5d4037; position:relative; overflow:hidden; background:#fff; margin: 10px 0;">
+            <img id="player" src="character.png" style="width:50px; position:absolute; bottom:0; left:20px;">
+            <div id="thorn" style="width:25px; height:25px; background:red; position:absolute; bottom:0; right:-30px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+        </div>
+        <p id="game-status">Tap screen to jump! Score 10.</p>
+        <p id="score" style="font-weight:bold;">Score: 0</p>
+        
+        <div id="hug-reveal" style="display:none; text-align:center;">
+            <p>You made it! 🫂</p>
+            <img src="hug.jpg" style="width:100%; height:160px; object-fit:cover; border: 5px solid white;">
+            <button class="btn" onclick="unlockFinal()">See my Surprise</button>
+        </div>
+    </div>
+
+    <div class="page" id="p5" style="z-index: 1;">
         <h2>Congratulations!</h2>
-        <p>Scratch the card below to claim your prize:</p>
+        <p>Scratch the card to claim your prize:</p>
         <div id="scratch-container">
             <div id="scratch-text">
                 Congratulations! You have won an exclusive date with me on February 13!
@@ -109,101 +134,117 @@
 </div>
 
 <script>
-    function checkLevel1() {
-        if(document.getElementById('ans1').value.toLowerCase().trim() === "love") {
-            document.getElementById('p1').classList.add('flipped');
-            setTimeout(() => { document.getElementById('p1').style.zIndex = 0; }, 600);
-        } else { alert("Try again!"); }
-    }
+    // --- LEVEL 1 & 2 LOGIC ---
+function checkLevel1() {
+    if(document.getElementById('ans1').value.toLowerCase().trim() === "love") {
+        document.getElementById('p1').classList.add('flipped');
+        setTimeout(() => { document.getElementById('p1').style.zIndex = 0; }, 600);
+    } else { alert("Try again!"); }
+}
 
-    function checkLevel2() {
-    // This line ensures the computer compares lowercase to lowercase
-    if(document.getElementById('ans2').value.toLowerCase().trim() === "maldita") {
+function checkLevel2() {
+    // Corrected to lowercase "matilda" to match your scrambled word
+    if(document.getElementById('ans2').value.toLowerCase().trim() === "matilda") {
         document.getElementById('p2').classList.add('flipped');
-        setTimeout(() => { 
-            document.getElementById('p2').style.zIndex = 0; 
-            initScratch(); 
-        }, 600);
-    } else { 
-        alert("Try again!"); 
+        setTimeout(() => { document.getElementById('p2').style.zIndex = 0; }, 600);
+    } else { alert("Try again!"); }
+}
+
+// --- LEVEL 3 QUIZ LOGIC ---
+let currentQ = 1;
+function checkQuiz() {
+    const val = document.getElementById('ansQuiz').value.toLowerCase().trim();
+    
+    if (currentQ === 1 && val === "answer1") { // Change answer1 to your real answer
+        currentQ = 2;
+        document.getElementById('question-text').innerText = "Question 2: [Your 2nd Question]?";
+        document.getElementById('ansQuiz').value = "";
+    } else if (currentQ === 2 && val === "answer2") { // Change answer2
+        currentQ = 3;
+        document.getElementById('question-text').innerText = "Question 3: [Your 3rd Question]?";
+        document.getElementById('ansQuiz').value = "";
+    } else if (currentQ === 3 && val === "answer3") { // Change answer3
+        document.getElementById('p3').classList.add('flipped');
+        setTimeout(() => { document.getElementById('p3').style.zIndex = 0; initGame(); }, 600);
+    } else {
+        alert("Not quite, try again!");
     }
 }
 
-    function initScratch() {
+// --- LEVEL 4 JUMP GAME LOGIC ---
+let gameScore = 0;
+let isPlaying = false;
+function initGame() {
+    isPlaying = true;
+    const player = document.getElementById('player');
+    const thorn = document.getElementById('thorn');
+    let jumping = false;
+
+    document.addEventListener('touchstart', () => {
+        if (!jumping && isPlaying) {
+            jumping = true;
+            player.style.transition = "bottom 0.3s";
+            player.style.bottom = "80px";
+            setTimeout(() => { player.style.bottom = "0"; jumping = false; }, 300);
+        }
+    });
+
+    let tPos = 300;
+    let loop = setInterval(() => {
+        if (!isPlaying) { clearInterval(loop); return; }
+        tPos -= 6;
+        if (tPos < -30) {
+            tPos = 300;
+            gameScore++;
+            document.getElementById('score').innerText = "Score: " + gameScore;
+            if (gameScore >= 10) { isPlaying = false; showHug(); }
+        }
+        thorn.style.right = (300 - tPos) + "px";
+
+        if (tPos > 210 && tPos < 250 && !jumping) { // Collision
+            gameScore = 0;
+            document.getElementById('score').innerText = "Score: 0";
+            tPos = 300;
+        }
+    }, 20);
+}
+
+function showHug() {
+    document.getElementById('game-area').style.display = "none";
+    document.getElementById('score').style.display = "none";
+    document.getElementById('game-status').style.display = "none";
+    document.getElementById('hug-reveal').style.display = "block";
+}
+
+function unlockFinal() {
+    document.getElementById('p4').classList.add('flipped');
+    setTimeout(() => { document.getElementById('p4').style.zIndex = 0; initScratch(); }, 600);
+}
+
+// --- FINAL SCRATCH LOGIC ---
+function initScratch() {
     const canvas = document.getElementById('scratch-canvas');
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#C0C0C0';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
     ctx.fillStyle = '#888';
     ctx.font = '20px Georgia';
     ctx.textAlign = 'center';
     ctx.fillText('SCRATCH HERE', 150, 85);
 
-    let isDrawing = false;
-    let effectTriggered = false;
-
+    let drawing = false;
     function scratch(e) {
-        if (!isDrawing) return;
+        if (!drawing) return;
         const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-        const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
-        
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(x, y, 25, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Check how much is scratched every 20th movement to save battery
-        checkScratchPercentage();
+        ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
     }
-
-    function checkScratchPercentage() {
-        if (effectTriggered) return;
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const pixels = imageData.data;
-        let clearPixels = 0;
-
-        for (let i = 3; i < pixels.length; i += 4) {
-            if (pixels[i] === 0) clearPixels++;
-        }
-
-        const percentage = (clearPixels / (pixels.length / 4)) * 100;
-
-        if (percentage > 50) { // If 50% is scratched
-            effectTriggered = true;
-            triggerCelebration();
-        }
-    }
-
-    function triggerCelebration() {
-        // Play Sound
-        document.getElementById('successSound').play();
-        
-        // Start Carnation Fall
-        setInterval(createCarnation, 300);
-        
-        // Optional: Fade out the remaining silver coating
-        canvas.style.transition = "opacity 1s";
-        canvas.style.opacity = "0";
-    }
-
-    function createCarnation() {
-        const petal = document.createElement('div');
-        petal.classList.add('carnation');
-        petal.style.left = Math.random() * 100 + 'vw';
-        petal.style.width = Math.random() * 20 + 10 + 'px';
-        petal.style.height = petal.style.width;
-        petal.style.animationDuration = Math.random() * 3 + 4 + 's';
-        document.body.appendChild(petal);
-        setTimeout(() => petal.remove(), 6000);
-    }
-
-    canvas.addEventListener('mousedown', () => isDrawing = true);
-    canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); });
-    window.addEventListener('mouseup', () => isDrawing = false);
-    window.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); });
+    window.addEventListener('mouseup', () => drawing = false);
+    window.addEventListener('touchend', () => drawing = false);
     canvas.addEventListener('mousemove', scratch);
     canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); });
 }
