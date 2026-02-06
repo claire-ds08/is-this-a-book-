@@ -7,37 +7,20 @@
     <style>
         :root { --paper: #f4ecd8; --accent: #d4a373; --text: #5d4037; }
         body { background: #2c241e; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; perspective: 2000px; font-family: 'Georgia', serif; overflow: hidden; touch-action: none; }
-        
         .audio-player { position: absolute; top: 20px; z-index: 100; background: rgba(244, 236, 216, 0.9); padding: 5px 15px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
-
         .book { width: 380px; height: 500px; position: relative; transform-style: preserve-3d; }
-        
-        .page { 
-            width: 100%; height: 100%; position: absolute; background: var(--paper);
-            border: 1px solid var(--accent); padding: 25px; box-sizing: border-box;
-            display: flex; flex-direction: column; align-items: center;
-            backface-visibility: hidden; transform-origin: left;
-            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-            box-shadow: inset 3px 0 20px rgba(0,0,0,0.1);
-        }
-
+        .page { width: 100%; height: 100%; position: absolute; background: var(--paper); border: 1px solid var(--accent); padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backface-visibility: hidden; transform-origin: left; transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); box-shadow: inset 3px 0 20px rgba(0,0,0,0.1); }
         .flipped { transform: rotateY(-180deg); }
         .grid-4pics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
         .grid-4pics img { width: 120px; height: 120px; object-fit: cover; border: 4px solid white; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
-        
         input { padding: 12px; border: 1px solid var(--accent); border-radius: 4px; text-align: center; width: 80%; font-size: 1rem; outline: none; }
         .btn { margin-top: 15px; padding: 10px 25px; background: var(--accent); color: white; border: none; cursor: pointer; border-radius: 4px; }
-
-        /* Game & Effects */
         #game-area { width: 100%; height: 200px; border-bottom: 3px solid var(--text); position: relative; overflow: hidden; background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%); margin: 10px 0; border-radius: 8px; }
         #heart-pop { position: absolute; bottom: 60px; left: 135px; font-size: 30px; display: none; animation: heartbeat 1s infinite; z-index: 10; }
         @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
-
-        /* Scratch Card */
         #scratch-container { position: relative; width: 300px; height: 150px; margin-top: 20px; cursor: crosshair; }
         #scratch-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; color: var(--text); font-size: 1.1rem; background: #fff; border: 2px dashed var(--accent); padding: 10px; box-sizing: border-box; }
         #scratch-canvas { position: absolute; top: 0; left: 0; z-index: 10; }
-
         .carnation { position: absolute; background-color: #ffa3b1; border-radius: 50% 0 50% 0; opacity: 0.8; pointer-events: none; z-index: 100; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(100vh) rotate(360deg); } }
     </style>
@@ -98,7 +81,7 @@
     <div class="page" id="p5" style="z-index: 1;">
         <h2>Congratulations!</h2>
         <div id="scratch-container">
-            <div id="scratch-text"> You have won a date with me on Feb 13! ❤️</div>
+            <div id="scratch-text">You have won a date with me on Feb 13! ❤️</div>
             <canvas id="scratch-canvas" width="300" height="150"></canvas>
         </div>
         <button class="btn" onclick="location.reload()">Restart</button>
@@ -106,20 +89,24 @@
 </div>
 
 <script>
-    // Levels 1 & 2
+    function flip(id) {
+        document.getElementById(id).classList.add('flipped');
+        setTimeout(() => { document.getElementById(id).style.zIndex = 0; }, 600);
+    }
+
     function checkLevel1() {
         if(document.getElementById('ans1').value.toLowerCase().trim() === "love") {
             flip('p1');
         } else alert("Try again!");
     }
+
     function checkLevel2() {
-        if(document.getElementById('ans2').value.toLowerCase().trim() === "maldita") {
+        // Correcting spelling from "maldita" to "matilda" to match your scramble letters
+        if(document.getElementById('ans2').value.toLowerCase().trim() === "matilda") {
             flip('p2');
         } else alert("Try again!");
     }
 
-    // Level 3 Quiz
-    // Level 3 Quiz
     let curQ = 1;
     function checkQuiz() {
         const val = document.getElementById('ansQuiz').value.toLowerCase().trim();
@@ -128,40 +115,28 @@
         const input = document.getElementById('ansQuiz');
 
         if(curQ === 1) {
-            if(val === "quezon") { // <-- EDIT 1st ANSWER HERE
-                curQ = 2; 
-                label.innerText = "QUESTION 2 OF 3"; 
-                text.innerText = "Where was our first date?"; // <-- EDIT 2nd QUESTION
-                input.value = "";
-            } else { alert("Not quite! Try again."); }
-        } 
-        else if(curQ === 2) {
-            if(val === "sm seaside") { // <-- EDIT 2nd ANSWER HERE
-                curQ = 3; 
-                label.innerText = "QUESTION 3 OF 3"; 
-                text.innerText = "When was our first photo taken?"; // <-- EDIT 3rd QUESTION
-                input.value = "";
-            } else { alert("Wrong answer! Hint: PNA Convention."); }
-        } 
-        else if(curQ === 3) {
-            if(val === "august 30") { // <-- EDIT 3rd ANSWER HERE
-                // THIS PART WAS LIKELY BROKEN - IT NOW FLIPS PROPERLY
-                flip('p3'); 
-                setTimeout(() => {
-                    initGame(); // This starts the jumping game on the next page
-                }, 1000);
-            } else { alert("Last one! You can do it!"); }
-    }
+            if(val === "quezon") {
+                curQ = 2; label.innerText = "QUESTION 2 OF 3"; text.innerText = "Where was our first date?"; input.value = "";
+            } else alert("Not quite! Try again.");
+        } else if(curQ === 2) {
+            if(val === "sm seaside") {
+                curQ = 3; label.innerText = "QUESTION 3 OF 3"; text.innerText = "When was our first photo taken?"; input.value = "";
+            } else alert("Wrong answer! Hint: PNA Convention.");
+        } else if(curQ === 3) {
+            if(val === "august 30") {
+                flip('p3');
+                setTimeout(initGame, 1000);
+            } else alert("Last one! You can do it!");
+        }
     }
 
-    // Level 4 Game
     let score = 0, isPlaying = false;
     function initGame() {
         isPlaying = true;
         const thorn = document.getElementById('thorn');
         document.addEventListener('touchstart', (e) => {
             const p = document.getElementById('player');
-            if(isPlaying && p.style.bottom === "0px" || !p.style.bottom) {
+            if(isPlaying && (p.style.bottom === "0px" || !p.style.bottom)) {
                 p.style.bottom = "80px";
                 setTimeout(() => p.style.bottom = "0", 300);
             }
@@ -174,9 +149,8 @@
             if(tPos < -30) { tPos = 300; score++; document.getElementById('score').innerText = "Score: " + score; }
             if(score >= 10) { isPlaying = false; showHug(); }
             thorn.style.right = (300 - tPos) + "px";
-            // Collision
-            const pBottom = parseInt(document.getElementById('player').style.bottom);
-            if(tPos > 210 && tPos < 250 && (!pBottom || pBottom < 25)) { score = 0; tPos = 300; document.getElementById('score').innerText = "Score: 0"; }
+            const pBottom = parseInt(document.getElementById('player').style.bottom) || 0;
+            if(tPos > 210 && tPos < 250 && pBottom < 25) { score = 0; tPos = 300; document.getElementById('score').innerText = "Score: 0"; }
         }, 20);
     }
 
@@ -190,11 +164,6 @@
             document.getElementById('successSound').play();
             setInterval(createCarnation, 400);
         }, 1000);
-    }
-
-    function flip(id) {
-        document.getElementById(id).classList.add('flipped');
-        setTimeout(() => document.getElementById(id).style.zIndex = 0, 600);
     }
 
     function unlockFinal() { flip('p4'); initScratch(); }
